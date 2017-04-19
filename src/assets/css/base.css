@@ -1,0 +1,33 @@
+body {
+	margin: 0;
+	background-color: #fafafa;
+	font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+h2 {
+	margin: 0;
+	font-size: 12px;
+}
+
+a {
+	color: #000;
+	text-decoration: none;
+}
+
+input {
+	outline: 0;
+}
+
+button {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-size: 100%;
+	vertical-align: baseline;
+	font-family: inherit;
+	font-weight: inherit;
+	font-weight: inherit;
+	color: inherit;
+	outline: 0;
+}
