@@ -10,9 +10,7 @@
       <ul class="task-count">
         <li>{{noCheckedLength}}个任务未完成</li>
         <li class="action">
-          <a class="active" href="#">所有任务</a>
-          <a href="#">未完成的任务</a>
-          <a href="#">完成的任务</a>
+          <a v-for="item in hashItems" :class="{active: item.isActive}" @click="handleHash(item)">{{item.title}}</a>
         </li>
       </ul>
 
@@ -20,7 +18,7 @@
       <div class="tasks">
         <span class="no-task-tip" v-if="list.length==0">还没有添加任何任务</span>
         <ul class="todo-list">
-          <li class="todo" v-for="(item, index) in list"
+          <li class="todo" v-for="(item, index) in filterList"
               :class="{completed: item.isChecked, editing: isEditorItem(item)}">
             <div class="view">
               <input class="toggle" type="checkbox" v-model="item.isChecked">
@@ -43,14 +41,56 @@
 </template>
 
 <script>
+  let store = {
+    save (key, value) {
+      localStorage.setItem(key, JSON.stringify(value))
+    },
+    fetch (key) {
+      return JSON.parse(localStorage.getItem(key)) || []
+    }
+  }
+  let list = store.fetch('all')
+  let filter = {
+    all: function (list) {
+      return list
+    },
+    finished: function (list) {
+      return list.filter(function (item) {
+        return item.isChecked
+      })
+    },
+    unfinished: function () {
+      return list.filter(function (item) {
+        return !item.isChecked
+      })
+    }
+  }
   export default {
     name: 'todoList',
     data () {
       return {
         todo: '',
-        list: [],
+        list: list,
         editorTodoItem: null,
-        beforeTodoContent: ''
+        beforeTodoContent: '',
+        hash: 'all',
+        hashItems: [
+          {
+            title: '所有任务',
+            isActive: true,
+            hash: 'all'
+          },
+          {
+            title: '未完成的任务',
+            isActive: false,
+            hash: 'unfinished'
+          },
+          {
+            title: '完成的任务',
+            isActive: false,
+            hash: 'finished'
+          }
+        ]
       }
     },
     methods: {
@@ -75,6 +115,13 @@
       cancelEdit (item) {
         item.title = this.beforeTodoContent
         this.editorTodoItem = null
+      },
+      handleHash (item) {
+        for (let i = 0; i < this.hashItems.length; i++) {
+          this.hashItems[i].isActive = false
+        }
+        item.isActive = true
+        this.hash = item.hash
       }
     },
     computed: {
@@ -86,6 +133,9 @@
           }
         }
         return count
+      },
+      filterList: function () {
+        return filter[this.hash] ? filter[this.hash](this.list) : this.list
       }
     },
     directives: {
@@ -95,6 +145,14 @@
             el.focus()
           }
         }
+      }
+    },
+    watch: {
+      list: {
+        handler: function () {
+          store.save('all', this.list)
+        },
+        deep: true
       }
     }
   }
@@ -116,15 +174,16 @@
   }
 
   body {
-    margin:0;
+    margin: 0;
     background-color: #fafafa;
     font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
-  h2{
-    margin:0;
+  h2 {
+    margin: 0;
     font-size: 12px;
   }
+
   a {
     color: #000;
     text-decoration: none;
@@ -148,27 +207,27 @@
   }
 
   ul {
-    padding:0;
-    margin:0;
+    padding: 0;
+    margin: 0;
     list-style: none;
   }
 
   .main {
     width: 50%;
     margin: 0px auto;
-    box-sizing:border-box;
+    box-sizing: border-box;
   }
 
   .task-input {
     width: 99%;
-    height:30px;
+    height: 30px;
     outline: 0;
     border: 1px solid #ccc;
   }
 
-  .task-count{
+  .task-count {
     display: flex;
-    margin:10px 0;
+    margin: 10px 0;
   }
 
   .task-count li {
@@ -177,7 +236,7 @@
     color: #dd4b39;
   }
 
-  .task-count li:nth-child(1){
+  .task-count li:nth-child(1) {
     padding: 5px 0 0 10px;
   }
 
@@ -185,6 +244,7 @@
     text-align: center;
     display: flex;
   }
+
   .action a {
     margin: 0px 10px;
     flex: 1;
@@ -193,7 +253,7 @@
 
   }
 
-  .action a:nth-child(3){
+  .action a:nth-child(3) {
     margin-right: 0;
   }
 
@@ -204,17 +264,17 @@
   .tasks {
     background-color: #fff;
   }
+
   .no-task-tip {
-    padding:10px 0 10px 10px;
+    padding: 10px 0 10px 10px;
     display: block;
     border-bottom: 1px solid #ededed;
-    color:#777;
+    color: #777;
   }
 
   .big-title {
     color: #222;
   }
-
 
   .todo-list {
     margin: 0;
@@ -231,7 +291,6 @@
   .todo-list li:hover {
     background-color: #fafafa;
   }
-
 
   .todo-list li.editing {
     border-bottom: none;

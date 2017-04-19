@@ -10,6 +10,10 @@ export default new Router({
       path: '/',
       name: 'todolist',
       component: TodoList
+    },
+    {
+      path: '*',
+      component: TodoList
     }
   ]
 })
