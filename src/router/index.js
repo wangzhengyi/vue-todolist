@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import TodoList from '../components/TodoList.vue'
+import TodoList from '../pages/TodoList.vue'
+import SelectPage from '../pages/SelectPage.vue'
 
 Vue.use(Router)
 
@@ -10,6 +11,11 @@ export default new Router({
       path: '/',
       name: 'todolist',
       component: TodoList
+    },
+    {
+      path: '/select',
+      name: 'select',
+      component: SelectPage
     },
     {
       path: '*',
